@@ -12,6 +12,8 @@ services:
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
       - MODEL_NAME=ciri_model
+    depends_on:
+      - mlflow
     networks:
       - backend
 
@@ -27,6 +29,23 @@ services:
       - "5000:5000"
     expose:
       - "5000"
+    networks:
+      - frontend
+      - backend
+
+  api:
+    restart: always
+    build: ../backend_apis
+    container_name: ciri_apis
+    ports:
+      - "80:80"
+    expose:
+      - "80"
+    environment:
+      - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
+      - MODEL_NAME=ciri_model
+    depends_on:
+      - mlflow
     networks:
       - frontend
       - backend
