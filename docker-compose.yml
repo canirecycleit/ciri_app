@@ -9,6 +9,8 @@ services:
     build: ../model_training_pipeline
     image: ciri_model_pipeline
     container_name: ciri_model_pipeline
+    volumes:
+      - ./data:/app/data
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
       - MODEL_NAME=ciri_model
