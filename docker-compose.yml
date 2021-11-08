@@ -5,12 +5,12 @@ x-build-args: &build_args
 
 services:
   model-pipeline:
-    restart: always
     build: ../model_training_pipeline
     image: ciri_model_pipeline
     container_name: ciri_model_pipeline
     volumes:
       - ./data:/app/data
+      - ./artifact-store:/artifact-store
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
       - MODEL_NAME=ciri_model
