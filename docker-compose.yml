@@ -51,7 +51,7 @@ services:
       - ./artifact-store:/artifact-store
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
-      - MODEL_NAME=ciri_model
+      - MODEL_NAME=ciri_trashnet_model
     depends_on:
       - mlflow
     networks:
