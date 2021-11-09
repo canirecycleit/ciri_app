@@ -1,5 +1,9 @@
 version: "3.6"
 
+# Using Docker_BuildKit which requires:
+# export DOCKER_BUILDKIT=1
+# export COMPOSE_DOCKER_CLI_BUILD=1
+
 x-build-args: &build_args
   INSTALL_PYTHON_VERSION: 3.8
 
@@ -53,6 +57,19 @@ services:
     networks:
       - frontend
       - backend
+
+  ui:
+    restart: always
+    build: ../frontend_ui
+    container_name: ciri_ui
+    ports:
+      - "80:8080"
+    expose:
+      - "8080"
+    volumes:
+      - "../frontend_ui:/app"
+    networks:
+      - frontend
 
 networks:
   frontend:
