@@ -51,10 +51,11 @@ services:
       - "80"
     volumes:
       - "../backend_apis:/app"
-      - ./artifact-store:/artifact-store
+      - ./secrets:/secrets
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
       - MODEL_NAME=ciri_trashnet_model
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/ciri-cloud-storage.json
     depends_on:
       - mlflow
     networks:
