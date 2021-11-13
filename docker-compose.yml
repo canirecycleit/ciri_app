@@ -45,8 +45,6 @@ services:
     restart: always
     build: ../backend_apis
     container_name: ciri_apis
-    ports:
-      - "8080:80"
     expose:
       - "80"
     volumes:
@@ -66,14 +64,25 @@ services:
     restart: always
     build: ../frontend_ui
     container_name: ciri_ui
-    ports:
-      - "80:8080"
     expose:
       - "8080"
     volumes:
       - "../frontend_ui:/app"
     networks:
       - frontend
+
+  nginx:
+    container_name: ciri_nginx
+    image: nginx:stable
+    ports:
+      - "80:80"
+    volumes:
+      - "./conf/nginx/nginx.conf:/etc/nginx/nginx.conf"
+    networks:
+      - frontend
+    depends_on:
+      - ui
+      - api
 
 networks:
   frontend:
