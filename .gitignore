@@ -1,3 +1,4 @@
 db/
 artifact-store/
 data/
+secrets/

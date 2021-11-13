@@ -14,10 +14,11 @@ services:
     container_name: ciri_model_pipeline
     volumes:
       - ./data:/app/data
-      - ./artifact-store:/artifact-store
+      - ./secrets:/secrets
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
       - MODEL_NAME=ciri_model
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/ciri-cloud-storage.json
     depends_on:
       - mlflow
     networks:
@@ -28,9 +29,11 @@ services:
     build: ../mlflow
     image: ciri_mlflow
     container_name: ciri_mlflow
+    environment:
+      - GOOGLE_APPLICATION_CREDENTIALS=/secrets/ciri-cloud-storage.json
     volumes:
       - ./db:/db
-      - ./artifact-store:/artifact-store
+      - ./secrets:/secrets
     ports:
       - "5000:5000"
     expose:
