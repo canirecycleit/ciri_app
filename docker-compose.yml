@@ -62,7 +62,8 @@ services:
 
   ui:
     restart: always
-    build: ../frontend_ui
+    # build: ../frontend_ui
+    image: ghcr.io/canirecycleit/frontend_ui/ciri_frontend:latest
     container_name: ciri_ui
     expose:
       - "8080"
