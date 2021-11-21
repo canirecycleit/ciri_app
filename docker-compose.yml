@@ -10,13 +10,13 @@ x-build-args:
 
 services:
   model-pipeline:
-    # build: ../model_training_pipeline
-    # image: ciri_model_pipeline
-    image: ghcr.io/canirecycleit/model_training_pipeline/ciri_model_pipeline:latest
+    build: ../model_training_pipeline
+    image: ciri_model_pipeline
+    # image: ghcr.io/canirecycleit/model_training_pipeline/ciri_model_pipeline:latest
     container_name: ciri_model_pipeline
     volumes:
       - secret-vol:/secrets
-      # - ./data:/app/data
+      - ./data:/app/data
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
       - MODEL_NAME=ciri_model
@@ -28,9 +28,9 @@ services:
 
   mlflow:
     restart: always
-    # build: ../mlflow
-    # image: ciri_mlflow
-    image: ghcr.io/canirecycleit/mlflow/ciri_apis:latest
+    build: ../mlflow
+    image: ciri_mlflow
+    # image: ghcr.io/canirecycleit/mlflow/ciri_apis:latest
     container_name: ciri_mlflow
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/ciri-cloud-storage.json
@@ -46,11 +46,12 @@ services:
 
   api:
     restart: always
-    # build: ../backend_apis
-    image: ghcr.io/canirecycleit/backend_apis/ciri_apis:latest
+    build: ../backend_apis
+    image: ciri_apis
+    # image: ghcr.io/canirecycleit/backend_apis/ciri_apis:latest
     container_name: ciri_apis
     expose:
-      - "80"
+      - "8080"
     volumes:
       - secret-vol:/secrets
     environment:
@@ -65,8 +66,9 @@ services:
 
   ui:
     restart: always
-    # build: ../frontend_ui
-    image: ghcr.io/canirecycleit/frontend_ui/ciri_frontend:latest
+    build: ../frontend_ui
+    image: ciri_ui
+    # image: ghcr.io/canirecycleit/frontend_ui/ciri_frontend:latest
     container_name: ciri_ui
     expose:
       - "8080"
@@ -95,14 +97,10 @@ networks:
     driver: bridge
 
 volumes:
-  secret-vol: null
-  #    driver: local
-  #    driver_opts:
-  #      type: none
-  #      o: bind
-  #      device: $PWD/secrets
+  secret-vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/secrets
   db-vol: null
-
-#secrets:
-#  google-storage-credentials:
-#    file: ./secrets/ciri-cloud-storage.json
