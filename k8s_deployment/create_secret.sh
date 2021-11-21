@@ -1,0 +1,1 @@
+kubectl create secret generic ciri-cloud-storage --from-file=ciri-cloud-storage.json=/project/secrets/ciri-cloud-storage.json
