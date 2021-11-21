@@ -11,4 +11,4 @@ spec:
       targetPort: 5000
   selector:
     io.kompose.service: mlflow
-  type: NodePort
+  type: LoadBalancer
