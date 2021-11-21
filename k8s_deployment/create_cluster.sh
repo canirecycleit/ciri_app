@@ -7,3 +7,4 @@ helm upgrade --install ingress-nginx ingress-nginx \
 kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.0.5/deploy/static/provider/cloud/deploy.yaml
 
 # kubectl create ingress ui --class=nginx --rule=/*=ui:8080
+# kubectl create ingress api --class=nginx --rule=/api/*=api:8080
