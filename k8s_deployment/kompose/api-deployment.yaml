@@ -23,7 +23,7 @@ spec:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /secrets/ciri-cloud-storage.json
             - name: MLFLOW_TRACKING_URI
-              value: http://ciri_mlflow:5000/
+              value: http://mlflow:5000/
             - name: MODEL_NAME
               value: ciri_trashnet_model
           image: ghcr.io/canirecycleit/backend_apis/ciri_apis:latest
