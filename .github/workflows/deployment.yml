@@ -34,12 +34,7 @@ jobs:
 
       - name: Deploy UI
         run: |-
-          if [[ $(kubectl get deployments|grep "ui") ]]; then   
-            kubectl patch deployment ui -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"
-          elif; then
-            kubectl apply -f k8s_deployment/kompose/ui-deployment.yaml
-            kubectl apply -f k8s_deployment/kompose/ui-service.yaml
-          fi
+          k8s_deployment/update_deploy.sh ui
 
       - name: Output Services
         run: |-
