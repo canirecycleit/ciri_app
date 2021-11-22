@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: mlflow
+  name: mlflow
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: mlflow
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.network/backend: "true"
+        io.kompose.service: mlflow
+    spec:
+      containers:
+        - env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/ciri-cloud-storage.json
+          image: ghcr.io/canirecycleit/mlflow/ciri_apis:latest
+          imagePullPolicy: Always
+          name: ciri-mlflow
+          ports:
+            - containerPort: 5000
+          resources: {}
+          volumeMounts:
+            - mountPath: /secrets
+              name: ciri-cloud-storage
+            - mountPath: /db
+              name: db-data
+      restartPolicy: Always
+      nodeSelector:
+        cloud.google.com/gke-nodepool: default-pool
+      volumes:
+        - name: ciri-cloud-storage
+          secret:
+            secretName: ciri-cloud-storage
+        - name: db-data
+          gcePersistentDisk:
+            pdName: gce-db-disk
+            fsType: ext4
+status: {}

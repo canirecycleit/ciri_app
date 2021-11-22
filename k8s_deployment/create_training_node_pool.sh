@@ -1,0 +1,1 @@
+gcloud container node-pools create training-pool --cluster=ciri-k8s-cluster --num-nodes=1 --machine-type e2-highmem-4

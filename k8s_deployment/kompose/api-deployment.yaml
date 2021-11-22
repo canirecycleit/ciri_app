@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    io.kompose.service: api
+  name: api
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      io.kompose.service: api
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        io.kompose.network/backend: "true"
+        io.kompose.network/frontend: "true"
+        io.kompose.service: api
+    spec:
+      containers:
+        - env:
+            - name: GOOGLE_APPLICATION_CREDENTIALS
+              value: /secrets/ciri-cloud-storage.json
+            - name: MLFLOW_TRACKING_URI
+              value: http://mlflow:5000/
+            - name: MODEL_NAME
+              value: ciri_trashnet_model
+          image: ghcr.io/canirecycleit/backend_apis/ciri_apis:latest
+          imagePullPolicy: Always
+          name: ciri-apis
+          ports:
+            - containerPort: 8080
+          resources: {}
+          volumeMounts:
+            - mountPath: /secrets
+              name: ciri-cloud-storage
+      restartPolicy: Always
+      nodeSelector:
+        cloud.google.com/gke-nodepool: default-pool
+      volumes:
+        - name: ciri-cloud-storage
+          secret:
+            secretName: ciri-cloud-storage
+status: {}

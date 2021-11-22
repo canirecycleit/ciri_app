@@ -4,19 +4,22 @@ version: "3.6"
 # export DOCKER_BUILDKIT=1
 # export COMPOSE_DOCKER_CLI_BUILD=1
 
-x-build-args: &build_args
+x-build-args:
+  &build_args
   INSTALL_PYTHON_VERSION: 3.8
 
 services:
   model-pipeline:
     build: ../model_training_pipeline
     image: ciri_model_pipeline
+    # image: ghcr.io/canirecycleit/model_training_pipeline/ciri_model_pipeline:latest
     container_name: ciri_model_pipeline
     volumes:
+      - secret-vol:/secrets
       - ./data:/app/data
-      - ./secrets:/secrets
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
+      # - MLFLOW_TRACKING_URI=http://35.196.213.150:5000/
       - MODEL_NAME=ciri_model
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/ciri-cloud-storage.json
     depends_on:
@@ -28,12 +31,13 @@ services:
     restart: always
     build: ../mlflow
     image: ciri_mlflow
+    # image: ghcr.io/canirecycleit/mlflow/ciri_apis:latest
     container_name: ciri_mlflow
     environment:
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/ciri-cloud-storage.json
     volumes:
-      - ./db:/db
-      - ./secrets:/secrets
+      - db-vol:/db
+      - secret-vol:/secrets
     ports:
       - "5000:5000"
     expose:
@@ -44,12 +48,13 @@ services:
   api:
     restart: always
     build: ../backend_apis
+    image: ciri_apis
+    # image: ghcr.io/canirecycleit/backend_apis/ciri_apis:latest
     container_name: ciri_apis
     expose:
-      - "80"
+      - "8080"
     volumes:
-      - "../backend_apis:/app"
-      - ./secrets:/secrets
+      - secret-vol:/secrets
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
       - MODEL_NAME=ciri_trashnet_model
@@ -62,13 +67,14 @@ services:
 
   ui:
     restart: always
-    # build: ../frontend_ui
-    image: ghcr.io/canirecycleit/frontend_ui/ciri_frontend:latest
+    build: ../frontend_ui
+    image: ciri_ui
+    # image: ghcr.io/canirecycleit/frontend_ui/ciri_frontend:latest
     container_name: ciri_ui
     expose:
       - "8080"
-    volumes:
-      - "../frontend_ui:/app"
+    # volumes:
+    #  - "../frontend_ui:/app"
     networks:
       - frontend
 
@@ -90,3 +96,12 @@ networks:
     driver: bridge
   backend:
     driver: bridge
+
+volumes:
+  secret-vol:
+    driver: local
+    driver_opts:
+      type: none
+      o: bind
+      device: $PWD/secrets
+  db-vol: null
