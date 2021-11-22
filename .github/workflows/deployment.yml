@@ -35,6 +35,8 @@ jobs:
       - name: Deploy UI
         run: |-
           k8s_deployment/update_deploy.sh ui
+          k8s_deployment/update_deploy.sh mlflow
+          k8s_deployment/update_deploy.sh api
 
       - name: Output Services
         run: |-
