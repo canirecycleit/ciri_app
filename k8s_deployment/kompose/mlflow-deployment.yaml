@@ -22,6 +22,7 @@ spec:
             - name: GOOGLE_APPLICATION_CREDENTIALS
               value: /secrets/ciri-cloud-storage.json
           image: ghcr.io/canirecycleit/mlflow/ciri_apis:latest
+          imagePullPolicy: Always
           name: ciri-mlflow
           ports:
             - containerPort: 5000

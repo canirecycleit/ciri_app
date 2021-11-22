@@ -19,6 +19,7 @@ services:
       - ./data:/app/data
     environment:
       - MLFLOW_TRACKING_URI=http://ciri_mlflow:5000/
+      # - MLFLOW_TRACKING_URI=http://35.196.213.150:5000/
       - MODEL_NAME=ciri_model
       - GOOGLE_APPLICATION_CREDENTIALS=/secrets/ciri-cloud-storage.json
     depends_on:

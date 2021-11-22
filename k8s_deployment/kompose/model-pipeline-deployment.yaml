@@ -26,6 +26,7 @@ spec:
             - name: MODEL_NAME
               value: ciri_model
           image: ghcr.io/canirecycleit/model_training_pipeline/ciri_model_pipeline:latest
+          imagePullPolicy: Always
           name: ciri-model-pipeline
           resources: {}
           volumeMounts:
