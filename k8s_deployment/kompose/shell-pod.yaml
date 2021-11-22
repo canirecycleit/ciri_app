@@ -6,8 +6,8 @@ metadata:
   name: shell
 spec:
   containers:
-    - image: ubuntu-minimal
-      name: ubuntu-shell
+    - image: nginx
+      name: linux-shell
       volumeMounts:
         - mountPath: /secrets
           name: ciri-cloud-storage
