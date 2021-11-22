@@ -2,6 +2,9 @@ name: CIRI GKE Deployment
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+    - master
 
 env:
   GKE_CLUSTER: ciri-k8s-cluster
