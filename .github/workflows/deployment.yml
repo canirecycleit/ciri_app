@@ -42,3 +42,4 @@ jobs:
           kubectl apply -f k8s_deployment/kompose/mlflow-service.yaml
           kubectl apply -f k8s_deployment/kompose/ingress.yaml
           kubectl get services -o wide
+          kubectl get services --namespace ingress-nginx
