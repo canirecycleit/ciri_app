@@ -31,5 +31,5 @@ jobs:
 
       - name: Deploy
         run: |-
-        kubectl apply -f k8s_deployment/kompose/ui-deployment.yaml
-        kubectl get services -o wide
+          kubectl apply -f k8s_deployment/kompose/ui-deployment.yaml
+          kubectl get services -o wide
