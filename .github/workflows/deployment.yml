@@ -28,18 +28,20 @@ jobs:
           project_id: ${{ secrets.GCP_PROJECT_ID }}
           service_account_key: ${{ secrets.GCP_SA_DEPLOYMENT }}
 
-      - name: Set GKE credentials
+      - name: Set GKE Credentials
         run: |-
           gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
-      - name: Deploy
+      - name: Deploy UI
         run: |-
-          kubectl apply -f k8s_deployment/kompose/ui-deployment.yaml
-          kubectl apply -f k8s_deployment/kompose/ui-service.yaml
-          kubectl apply -f k8s_deployment/kompose/api-deployment.yaml
-          kubectl apply -f k8s_deployment/kompose/api-service.yaml
-          kubectl apply -f k8s_deployment/kompose/mlflow-deployment.yaml
-          kubectl apply -f k8s_deployment/kompose/mlflow-service.yaml
-          kubectl apply -f k8s_deployment/kompose/ingress.yaml
+          if [[ $(kubectl get deployments|grep "ui") ]]; then   
+            kubectl patch deployment ui -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"
+          elif
+            kubectl apply -f k8s_deployment/kompose/ui-deployment.yaml
+            kubectl apply -f k8s_deployment/kompose/ui-service.yaml
+          fi
+
+      - name: Output Services
+        run: |-
           kubectl get services -o wide
           kubectl get services --namespace ingress-nginx
