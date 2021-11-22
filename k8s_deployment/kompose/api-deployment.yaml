@@ -36,6 +36,8 @@ spec:
             - mountPath: /secrets
               name: ciri-cloud-storage
       restartPolicy: Always
+      nodeSelector:
+        cloud.google.com/gke-nodepool: default-pool
       volumes:
         - name: ciri-cloud-storage
           secret:
