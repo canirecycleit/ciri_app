@@ -32,4 +32,10 @@ jobs:
       - name: Deploy
         run: |-
           kubectl apply -f k8s_deployment/kompose/ui-deployment.yaml
+          kubectl apply -f k8s_deployment/kompose/ui-service.yaml
+          kubectl apply -f k8s_deployment/kompose/api-deployment.yaml
+          kubectl apply -f k8s_deployment/kompose/api-service.yaml
+          kubectl apply -f k8s_deployment/kompose/mlflow-deployment.yaml
+          kubectl apply -f k8s_deployment/kompose/mlflow-service.yaml
+          kubectl apply -f k8s_deployment/kompose/ingress.yaml
           kubectl get services -o wide
