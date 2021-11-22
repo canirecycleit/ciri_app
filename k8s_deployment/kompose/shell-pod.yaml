@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    io.kompose.service: shell
+  name: shell
+spec:
+  containers:
+    - image: ubuntu-minimal
+      name: ubuntu-shell
+      volumeMounts:
+        - mountPath: /secrets
+          name: ciri-cloud-storage
+        - mountPath: /db
+          name: db-data
+  restartPolicy: Never
+  volumes:
+    - name: ciri-cloud-storage
+      secret:
+        secretName: ciri-cloud-storage
+    - name: db-data
+      gcePersistentDisk:
+        pdName: gce-db-disk
+        fsType: ext4
+status: {}
