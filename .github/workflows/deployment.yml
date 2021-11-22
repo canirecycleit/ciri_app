@@ -1,22 +1,35 @@
-name: CIRI App Deployment
+name: CIRI GKE Deployment
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - master
+
+env:
+  GKE_CLUSTER: ciri-k8s-cluster
+  GKE_ZONE: us-east1-c
 
 jobs:
   deployment:
     runs-on: ubuntu-latest
     environment:
       name: production
+    
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
         with:
           ref: ${{ github.event.pull_request.head.sha }}
 
-      - name: Say Hello
-        run:
-          echo 'Hello Production environment'
+      - name: Setup gcloud CLI 
+        uses: google-github-actions/setup-gcloud@master
+        with:
+          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          service_account_key: ${{ secrets.GCP_SA_DEPLOYMENT }}
+
+      - name: Set GKE credentials
+        run: |-
+          gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
+
+      - name: Deploy
+        run: |-
+        kubectl apply -f k8s_deployment/kompose/ui-deployment.yaml
+        kubectl get services -o wide
