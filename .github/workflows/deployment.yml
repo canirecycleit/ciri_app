@@ -32,7 +32,7 @@ jobs:
         run: |-
           gcloud container clusters get-credentials "$GKE_CLUSTER" --zone "$GKE_ZONE"
 
-      - name: Deploy UI
+      - name: Deploy
         run: |-
           k8s_deployment/update_deploy.sh ui
           k8s_deployment/update_deploy.sh mlflow
