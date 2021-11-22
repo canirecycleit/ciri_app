@@ -36,7 +36,7 @@ jobs:
         run: |-
           if [[ $(kubectl get deployments|grep "ui") ]]; then   
             kubectl patch deployment ui -p "{\"spec\": {\"template\": {\"metadata\": { \"labels\": {  \"redeploy\": \"$(date +%s)\"}}}}}"
-          elif
+          elif; then
             kubectl apply -f k8s_deployment/kompose/ui-deployment.yaml
             kubectl apply -f k8s_deployment/kompose/ui-service.yaml
           fi
