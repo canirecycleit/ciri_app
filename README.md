@@ -62,16 +62,89 @@ Service Account (SA) secrets for deployment operations are stored within GitHub 
 
 ## Getting Started
 
-Docker-shell...
+### Docker container
 
-Initial cluster creation scripts...
+A [docker container](k8s_deployment/Dockerfile) is provided to execute initial cluster startup scripts.  Interactive shell can be launched via:
 
-Setup secrets...
+```bash
+> cd k8s_deployment
+> ./docker-shell.sh
+```
 
-Create training pool if needed...
+You may get the error below if no cluster currently exists.  This can be ignored.
 
-Deploy model-pipeline Pod...
+```
+ERROR: (gcloud.container.clusters.get-credentials) ResponseError: code=404, message=Not found: projects/ciri-329403/zones/us-east1-c/clusters/ciri-k8s-cluster.
+No cluster named 'ciri-k8s-cluster' in ciri-329403.
+```
+
+### Cluster creation
+
+You can create initial cluster _from within the provided Docker container shell_ via
+
+```bash
+> ./create_cluster.sh
+```
+
+This command will:
+
+* Create an initial 2-node cluster
+* Install nginx-ingress controller in the cluster
+* Create a persistent disk for database (if doesn't already exist)
+
+You may get an error that indicates persistent disk already exists if you have previously created a cluster and have not removed the created `gce-db-disk`.  This can be ignored.
+
+### Create secrets
+
+You can create required secrets _from within the provided Docker container shell_ via
+
+```bash
+> ./create_secret.sh
+```
+
+It is required that `/ciri_app/secrets` folder exists and contains the `ciri-cloud-storage.json` file containing Google Service Account credentials.
+
+### Application deployment
+
+Once the cluster is established the CIRI application can be deployed by executing the [CIRI App GKE Deployment Action](https://github.com/canirecycleit/ciri_app/actions/workflows/deployment.yml) using the `Run workflow` button.
+
+Alternatively the application can be deployed by commiting a change to the ciri_app GitHub repository and approving the deployment task that is automatically generated.
+
+Alternatively the application can be deployed manually via use of the `kubectl apply` command to deploy yaml files from the `kompose` folder.
+
+### (Optional) Deploy Model Pipeline
+
+If you would like to run the model pipeline to create a new version of the model you should first create a dedicated `training-pool` node pool via
+
+```bash
+> ./create_traininig_node_pool.sh
+```
+
+and then deploy a run-once instance of the model-pipeline Pod via
+
+```bash
+> kubectl apply -f kompose/model-pipeline-pod.yaml
+```
+
+You should then be able to see your Pod executing via
+
+```bash
+> kubectl get all
+```
 
 ### Local Development
 
-Docker-compose
+The application can be run locally using
+
+```bash
+docker-compose up
+```
+
+The docker-compose file can be modified to mount volume drives in local file system to enable faster development.  For example within the `ui` service definition the following line can be enabled so that local changes to frontend_ui codebase are reflected in the deployed service:
+
+```yaml
+    # volumes:
+      - "../frontend_ui:/app"
+```
+
+Service account credentials should be stored in `./secrets` folder as `ciri-cloud-storage.json` with read permissions to image and artifact cloud stores.
