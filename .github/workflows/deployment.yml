@@ -38,6 +38,10 @@ jobs:
           k8s_deployment/update_deploy.sh mlflow
           k8s_deployment/update_deploy.sh api
 
+      - name: Update Ingress Rules
+        run: |-
+          kubectl apply -f k8s_deployment/kompose/ingress.yaml
+
       - name: Output Services
         run: |-
           kubectl get services -o wide
