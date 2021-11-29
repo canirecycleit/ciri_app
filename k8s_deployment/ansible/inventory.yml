@@ -1,7 +1,6 @@
 all:
     vars:
       ansible_user: sa_103428481057904205901
-      ansible_ssh_private_key_file: "../../secrets/ssh-key-deployment"
       gcp_service_account_file: "../../secrets/ciri-cloud-deployment.json"
       gcp_service_account_email: "ciri-deployment@ciri-329403.iam.gserviceaccount.com"
       gcp_auth_kind: "serviceaccount"
@@ -9,14 +8,5 @@ all:
       gcp_project: "ciri-329403"
       gcp_region: "us-east1"
       gcp_zone: "us-east1-c"
-      docker_network_name: "appnetwork"
       persistent_disk_name: "gce-db-disk"
       persistent_disk_size: 50
-      machine_instance_name: "ciri-app"
-      machine_type: "n2-standard-2"
-      machine_disk_size: 30
-
-    children:
-        appserver:
-            hosts:
-                34.123.21.62:
