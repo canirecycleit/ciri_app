@@ -1,0 +1,112 @@
+---
+- name: "Create Kubernetes Cluster"
+  hosts: localhost
+  gather_facts: false
+
+  vars:
+    cluster_name: "ciri-k8s-cluster"
+    machine_type: "n1-standard-1"
+    machine_disk_size: 30
+    initial_node_count: 2
+
+  tasks:
+  - name: "Create a GKE cluster"
+    google.cloud.gcp_container_cluster:
+      name: "{{cluster_name}}"
+      initial_node_count: "{{ initial_node_count }}"
+      location: "{{ gcp_zone }}"
+      project: "{{ gcp_project }}"
+      release_channel:
+        channel: "UNSPECIFIED"
+      ip_allocation_policy:
+        use_ip_aliases: "yes"
+      auth_kind: "{{ gcp_auth_kind }}"
+      service_account_file: "{{ gcp_service_account_file }}"
+      state: "{{ cluster_state }}"
+    register: cluster
+  
+  - name: "Create a Node Pool"
+    google.cloud.gcp_container_node_pool:
+      name: default-pool
+      initial_node_count: "{{ initial_node_count }}"
+      cluster: "{{ cluster }}"
+      location: "{{ gcp_zone }}"
+      project: "{{ gcp_project }}"
+      config:
+        machine_type: "{{ machine_type }}"
+        image_type: "COS"
+        disk_size_gb: "{{ machine_disk_size }}"
+        oauth_scopes:
+          - "https://www.googleapis.com/auth/devstorage.read_only"
+          - "https://www.googleapis.com/auth/logging.write"
+          - "https://www.googleapis.com/auth/monitoring"
+          - "https://www.googleapis.com/auth/servicecontrol"
+          - "https://www.googleapis.com/auth/service.management.readonly"
+          - "https://www.googleapis.com/auth/trace.append"
+      autoscaling:
+        enabled: "yes"
+        min_node_count: "1"
+        max_node_count: "{{ initial_node_count }}"
+      management:
+        auto_repair: "yes"
+        auto_upgrade: "yes"
+      auth_kind: "{{ gcp_auth_kind }}"
+      service_account_file: "{{ gcp_service_account_file }}"
+      state: "{{ cluster_state }}"
+  
+  - name: "Connect to cluster (update kubeconfig)"
+    shell: "gcloud container clusters get-credentials {{ cluster.name }} --zone {{ gcp_zone }} --project {{ gcp_project }}"
+    when: cluster_state == "present"
+
+  - name: "Create Namespace"
+    k8s:
+      name: "{{cluster_name}}-namespace"
+      api_version: v1
+      kind: Namespace
+      state: present
+    when: cluster_state == "present"
+
+  - name: "Add nginx-ingress helm repo"
+    community.kubernetes.helm_repository:
+      name: nginx-stable
+      repo_url: https://helm.nginx.com/stable
+    when: cluster_state == "present"
+
+  - name: "Install nginx-ingress"
+    community.kubernetes.helm:
+      name: nginx-ingress
+      namespace: "{{cluster_name}}-namespace"
+      chart_ref: nginx-stable/nginx-ingress
+      state: present
+    when: cluster_state == "present"
+
+  - name: "Create Persistent Volume Claim"
+    k8s:
+      state: present
+      definition:
+        apiVersion: v1
+        kind: PersistentVolumeClaim
+        metadata:
+          name: persistent-pvc
+          namespace: "{{cluster_name}}-namespace"
+        spec:
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 5Gi
+    when: cluster_state == "present"
+  
+  - name: Importing credentials as a Secret
+    shell: |
+      #!/bin/bash
+      kubectl create secret generic bucket-reader-key --from-file=bucket-reader.json=../../secrets/ciri-cloud-storage.json --namespace="{{cluster_name}}-namespace"
+    register: create_secret_op
+    ignore_errors: yes
+    when: cluster_state == "present"
+  
+  - name: "Print Create Secret Output"
+    debug:
+      var: create_secret_op
+    when: cluster_state == "present"
+  
