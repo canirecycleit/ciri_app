@@ -25,7 +25,7 @@
       state: "{{ cluster_state }}"
     register: cluster
   
-  - name: "Create a Node Pool"
+  - name: "Create App Node Pool"
     google.cloud.gcp_container_node_pool:
       name: default-pool
       initial_node_count: "{{ initial_node_count }}"
@@ -54,6 +54,35 @@
       service_account_file: "{{ gcp_service_account_file }}"
       state: "{{ cluster_state }}"
   
+  - name: "Create Training Node Pool"
+    google.cloud.gcp_container_node_pool:
+      name: training-pool
+      initial_node_count: "0"
+      cluster: "{{ cluster }}"
+      location: "{{ gcp_zone }}"
+      project: "{{ gcp_project }}"
+      config:
+        machine_type: "e2-highmem-4"
+        image_type: "COS"
+        disk_size_gb: "{{ machine_disk_size }}"
+        oauth_scopes:
+          - "https://www.googleapis.com/auth/devstorage.read_only"
+          - "https://www.googleapis.com/auth/logging.write"
+          - "https://www.googleapis.com/auth/monitoring"
+          - "https://www.googleapis.com/auth/servicecontrol"
+          - "https://www.googleapis.com/auth/service.management.readonly"
+          - "https://www.googleapis.com/auth/trace.append"
+      autoscaling:
+        enabled: "yes"
+        min_node_count: "0"
+        max_node_count: "1"
+      management:
+        auto_repair: "yes"
+        auto_upgrade: "yes"
+      auth_kind: "{{ gcp_auth_kind }}"
+      service_account_file: "{{ gcp_service_account_file }}"
+      state: "{{ cluster_state }}"
+
   - name: "Connect to cluster (update kubeconfig)"
     shell: "gcloud container clusters get-credentials {{ cluster.name }} --zone {{ gcp_zone }} --project {{ gcp_project }}"
     when: cluster_state == "present"

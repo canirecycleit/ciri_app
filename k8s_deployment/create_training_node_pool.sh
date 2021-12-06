@@ -1,1 +1,1 @@
-gcloud container node-pools create training-pool --cluster=ciri-k8s-cluster --num-nodes=1 --machine-type e2-highmem-4
+gcloud container node-pools create training-pool --cluster=$GCP_CLUSTER_NAME --enable-autoscaling --min-nodes 0 --max-nodes 1 --machine-type e2-highmem-4 --zone $GCP_ZONE
