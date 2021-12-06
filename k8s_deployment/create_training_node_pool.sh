@@ -1,1 +1,1 @@
-gcloud container node-pools create training-pool --cluster=$GCP_CLUSTER_NAME --enable-autoscaling --min-nodes 0 --max-nodes 1 --machine-type e2-highmem-4 --zone $GCP_ZONE
+gcloud container node-pools create training-pool --cluster=$GCP_CLUSTER_NAME --enable-autoscaling --min-nodes 0 --max-nodes 1 --num-nodes 2 --machine-type e2-highmem-4 --zone $GCP_ZONE
