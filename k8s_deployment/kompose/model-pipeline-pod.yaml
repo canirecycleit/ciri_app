@@ -1,37 +1,30 @@
-apiVersion: batch/v1
-kind: CronJob
+apiVersion: v1
+kind: Pod
 metadata:
   labels:
     io.kompose.service: model-pipeline
   name: model-pipeline
 spec:
-  # Weekly on Sunday:
-  schedule: "0 0 * * 0"
-  jobTemplate:
-    spec:
-      template:
-        spec:
-          containers:
-            - env:
-                - name: GOOGLE_APPLICATION_CREDENTIALS
-                  value: /secrets/ciri-cloud-storage.json
-                - name: MLFLOW_TRACKING_URI
-                  value: http://mlflow:5000/
-                - name: MODEL_NAME
-                  value: ciri_model
-              image: ghcr.io/canirecycleit/model_training_pipeline/ciri_model_pipeline:latest
-              imagePullPolicy: Always
-              name: ciri-model-pipeline
-              resources: {}
-              volumeMounts:
-                - mountPath: /secrets
-                  name: ciri-cloud-storage
-          nodeSelector:
-            cloud.google.com/gke-nodepool: training-pool
-          restartPolicy: Never
-          volumes:
-            - name: ciri-cloud-storage
-              secret:
-                secretName: ciri-cloud-storage
-  concurrencyPolicy: "Forbid"
-  successfulJobsHistoryLimit: 3
+  containers:
+    - env:
+        - name: GOOGLE_APPLICATION_CREDENTIALS
+          value: /secrets/ciri-cloud-storage.json
+        - name: MLFLOW_TRACKING_URI
+          value: http://mlflow:5000/
+        - name: MODEL_NAME
+          value: ciri_model
+      image: ghcr.io/canirecycleit/model_training_pipeline/ciri_model_pipeline:latest
+      imagePullPolicy: Always
+      name: ciri-model-pipeline
+      resources: {}
+      volumeMounts:
+        - mountPath: /secrets
+          name: ciri-cloud-storage
+  nodeSelector:
+    cloud.google.com/gke-nodepool: training-pool
+  restartPolicy: Never
+  volumes:
+    - name: ciri-cloud-storage
+      secret:
+        secretName: ciri-cloud-storage
+status: {}
