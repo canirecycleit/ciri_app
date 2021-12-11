@@ -1,7 +1,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: ciri-ingress
+  name: ciri-ingress-api
   annotations:
     kubernetes.io/ingress.class: "nginx"
     nginx.ingress.kubernetes.io/ssl-redirect: "false"
@@ -10,13 +10,6 @@ spec:
   rules:
   - http:
       paths:
-        - path: /app(/|$)(.*)
-          pathType: Prefix
-          backend:
-            service:
-              name: ui
-              port: 
-                number: 8080
         - path: /api(/|$)(.*)
           pathType: Prefix
           backend:
@@ -24,3 +17,4 @@ spec:
               name: api
               port:
                 number: 8080
+

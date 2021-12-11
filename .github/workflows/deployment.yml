@@ -40,7 +40,8 @@ jobs:
 
       - name: Update Ingress Rules
         run: |-
-          kubectl apply -f k8s_deployment/kompose/ingress.yaml
+          kubectl apply -f k8s_deployment/kompose/ingress-ui.yaml
+          kubectl apply -f k8s_deployment/kompose/ingress-api.yaml
 
       - name: Output Services
         run: |-
